@@ -100,3 +100,4 @@ AND name LIKE '%o%'
 AND name LIKE '%u%'
 AND NOT name LIKE '% %'
 
+-- Tutorial 3

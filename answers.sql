@@ -206,3 +206,126 @@ SELECT DISTINCT continent, COUNT(name) FROM world WHERE population > 10000000 GR
 SELECT continent FROM world GROUP BY continent HAVING SUM(population)>100000000
 
 -- Tutorial 6
+
+SELECT matchid, player FROM goal WHERE teamid = 'GER'
+
+SELECT id,stadium,team1,team2
+  FROM game WHERE id=1012
+
+SELECT player, teamid, stadium, mdate
+  FROM game JOIN goal ON (id=matchid) WHERE teamid = 'GER'
+
+SELECT team1, team2, player
+  FROM game JOIN goal ON (id=matchid) WHERE player LIKE '%Mario%'
+
+SELECT player, teamid, coach, gtime FROM goal JOIN eteam ON teamid = id WHERE gtime<=10
+
+SELECT mdate, teamname FROM game JOIN eteam ON (team1=eteam.id) WHERE coach = 'Fernando Santos'
+
+SELECT player FROM game JOIN goal ON (id = matchid) WHERE stadium = 'National Stadium, Warsaw'
+
+SELECT DISTINCT player
+  FROM game JOIN goal ON matchid = id WHERE (team1 = 'GER' OR team2 = 'GER') AND (goal.teamid != 'GER')
+
+SELECT teamname, COUNT(player) FROM eteam JOIN goal ON teamid=eteam.id  GROUP BY teamname
+
+SELECT stadium, COUNT(player) FROM game JOIN goal ON (game.id = goal.matchid) GROUP BY stadium
+
+SELECT matchid, mdate, COUNT(player) FROM game JOIN goal ON 
+
+SELECT matchid, mdate, COUNT(player) FROM game JOIN goal ON (teamid = team1 OR teamid = team2) GROUP BY matchid WHERE (team1 = 'POL' OR team2 = 'POL')
+
+SELECT matchid, mdate, goals FROM (SELECT matchid, COUNT(*) AS goals FROM goal GROUP BY matchid) AS x JOIN game ON matchid=id WHERE (team1 = 'POL' OR team2 = 'POL')
+
+SELECT matchid, mdate, goals FROM game JOIN (SELECT matchid, COUNT(*) AS goals FROM goal WHERE teamid = 'GER' GROUP BY matchid) AS gergoals ON id=matchid
+
+SELECT mdate, team1, score FROM 
+
+-- MISSING EXERCISE 13
+
+-- Tutorial 7
+
+SELECT id, title FROM movie WHERE yr = 1962
+
+SELECT yr FROM movie WHERE title = 'Citizen Kane'
+
+SELECT id, title, yr FROM movie WHERE title LIKE 'Star Trek%'
+
+SELECT id FROM actor WHERE name = 'Glenn Close'
+
+SELECT id FROM movie WHERE title = 'Casablanca'
+
+SELECT name FROM casting JOIN actor ON (id = actorid) WHERE movieid = 27
+
+SELECT name FROM
+(SELECT actorid FROM (SELECT id FROM movie WHERE title = 'Alien') as movie
+JOIN
+casting
+ON
+(movieid=id)) as a
+JOIN
+actor
+ON
+(actorid = id)
+
+SELECT title FROM 
+(SELECT title, actorid FROM movie JOIN casting ON id = movieid) as a
+JOIN
+actor
+ON actorid = id
+WHERE name = 'Harrison Ford'
+
+SELECT title FROM 
+(SELECT title, actorid FROM movie JOIN casting ON id = movieid 
+WHERE ord != 1) as a
+JOIN
+actor
+ON actorid = id
+WHERE name = 'Harrison Ford'
+
+SELECT title, name FROM 
+(SELECT title, actorid FROM movie JOIN casting ON id = movieid 
+WHERE ord = 1 AND yr = 1962) as a
+JOIN
+actor
+ON actorid = id
+
+SELECT yr,COUNT(title) FROM
+  movie JOIN casting ON movie.id=movieid
+        JOIN actor   ON actorid=actor.id
+WHERE name='Doris Day'
+GROUP BY yr
+HAVING COUNT(title) > 2
+
+SELECT title, name FROM
+movie JOIN casting ON (movieid = movie.id AND ord = 1)
+      JOIN actor ON (actorid = actor.id)
+WHERE movie.id IN (
+  SELECT movieid FROM casting WHERE actorid IN (
+    SELECT id FROM actor WHERE name = 'Julie Andrews'
+  )
+)
+
+SELECT name FROM actor JOIN
+(SELECT actorid, SUM(ord) AS starring FROM casting  WHERE ord = 1 GROUP BY actorid) AS a
+ON id = actorid
+WHERE starring > 14
+ORDER BY name
+
+SELECT title, castsize FROM movie JOIN
+(SELECT movieid, COUNT(actorid) AS castsize FROM casting GROUP BY movieid) as a
+ON id = movieid
+WHERE yr = 1978
+ORDER BY castsize DESC, title
+
+SELECT name FROM actor JOIN
+(SELECT actorid FROM casting JOIN
+(SELECT movieid FROM movie JOIN 
+(SELECT movieid, actorid FROM casting WHERE actorid = 2064) AS a
+ON id = movieid) AS b
+ON casting.movieid = b.movieid) AS c
+ON id = actorid
+WHERE name != 'Art Garfunkel'
+
+--Tutorial 8
+

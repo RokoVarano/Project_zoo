@@ -186,7 +186,11 @@ name = (SELECT TOP 1 name FROM world WHERE continent = 'Africa')
 SELECT name, continent, population FROM world a
 WHERE 25000000 >= ALL(SELECT population FROM world b WHERE b.continent LIKE a.continent)
 
--- MISSING EXERCISE 10
+SELECT name, continent FROM world w
+  WHERE population >= ALL(SELECT population*3
+                         FROM world y
+                         WHERE w.continent = y.continent
+                         and y.name != w.name)
 
 -- Tutorial 5
 
@@ -241,7 +245,12 @@ SELECT matchid, mdate, goals FROM game JOIN (SELECT matchid, COUNT(*) AS goals F
 
 SELECT mdate, team1, score FROM 
 
--- MISSING EXERCISE 13
+SELECT DISTINCT mdate, team1,	
+SUM(CASE WHEN teamid=team1 THEN 1 ELSE 0 END) score1, team2,
+SUM(CASE WHEN teamid=team2 THEN 1 ELSE 0 END) score2
+FROM game
+LEFT JOIN goal ON game.id = goal.matchid
+GROUP BY id, mdate, team1, team2
 
 -- Tutorial 7
 
@@ -408,4 +417,16 @@ ON a.num = b.num
 WHERE company = 'LRT'
 ORDER BY name
 
--- missing exercise 10
+SELECT DISTINCT c.num, c.company, stops.name, l.num, l.company
+FROM
+(SELECT a.company, a.num, b.stop
+ FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num)
+ WHERE a.stop=(SELECT id FROM stops WHERE name= 'Craiglockhart')
+) AS c
+  JOIN
+(SELECT a.company, a.num, b.stop
+ FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num)
+ WHERE a.stop=(SELECT id FROM stops WHERE name= 'Lochend')
+) AS l
+ON (c.stop = l.stop)
+JOIN stops ON(stops.id = c.stop)
